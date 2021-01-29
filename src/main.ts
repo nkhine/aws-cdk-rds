@@ -37,7 +37,7 @@ export class MwCatalogueStack extends Stack {
       engine: rds.DatabaseClusterEngine.AURORA_POSTGRESQL,
       vpc: vpc,
       parameterGroup: rds.ParameterGroup.fromParameterGroupName(this, 'ParameterGroup', 'default.aurora-postgresql10'),
-      // credentials: rds.Credentials.fromSecret(databaseCredentialsSecret),
+      credentials: rds.Credentials.fromSecret(databaseCredentialsSecret),
       scaling: {
         minCapacity: rds.AuroraCapacityUnit.ACU_2, // default is 2 Aurora capacity units (ACUs)
         maxCapacity: rds.AuroraCapacityUnit.ACU_16, // default is 16 Aurora capacity units (ACUs)
