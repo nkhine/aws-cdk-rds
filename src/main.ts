@@ -35,6 +35,12 @@ export class MwCatalogueStack extends Stack {
       stringValue: databaseCredentialsSecret.secretArn,
     });
 
+    new CfnOutput(this,'dbCredentialsSecretARN', {
+      description: 'The RDS cluster credentials secret ARN',
+      value: databaseCredentialsSecret.secretArn,
+      exportName: `${this.stackName}-CREDENTIALS-ARN`
+    });
+
     const cluster = new rds.ServerlessCluster(this, 'DBCluster', {
       engine: rds.DatabaseClusterEngine.AURORA_POSTGRESQL,
       vpc: vpc,
@@ -45,6 +51,8 @@ export class MwCatalogueStack extends Stack {
         maxCapacity: rds.AuroraCapacityUnit.ACU_16, // default is 16 Aurora capacity units (ACUs)
         autoPause: Duration.minutes(10),
       },
+      // https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html
+      enableDataApi: true,
     });
 
     Tags.of(cluster).add('Service', 'System');
