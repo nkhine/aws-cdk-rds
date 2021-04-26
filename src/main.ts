@@ -1,27 +1,29 @@
-import { App, Construct, Duration, CfnOutput, Stack, StackProps, Tags } from '@aws-cdk/core';
-import * as ec2 from '@aws-cdk/aws-ec2';
+import * as cdk from "@aws-cdk/core";
+import { Vpc, SubnetType } from "@aws-cdk/aws-ec2";
 import * as rds from '@aws-cdk/aws-rds';
 import * as secrets from '@aws-cdk/aws-secretsmanager';
-const ssm = require('@aws-cdk/aws-ssm');
+import { StringParameter } from '@aws-cdk/aws-ssm'
+// const ssm = require('@aws-cdk/aws-ssm');
 // import {AttachmentTargetType, ISecretAttachmentTarget, SecretAttachmentTargetProps, SecretTargetAttachment} from "@aws-cdk/aws-secretsmanager";
 
-export class RdsStack extends Stack {
+export class Stack extends cdk.Stack {
 
-  constructor(scope: Construct, id: string, props: StackProps = {}) {
+  constructor(scope: cdk.Construct, id: string, props: cdk.StackProps = {}) {
     super(scope, id, props);
 
     // define resources here...
-    // RDS needs to be setup in a VPC
-    const vpc = new ec2.Vpc(this, 'Vpc', {
+    // VPC
+    const vpc = new Vpc(this, 'Vpc', {
       cidr: '10.80.0.0/16',
-      maxAzs: 2, // Default is all AZs in the region
-      // subnetConfiguration: [
-      //   {
-      //     cidrMask: 24,
-      //     subnetType: ec2.SubnetType.ISOLATED,
-      //     name: 'Ingress'
-      //   }
-      // ]
+      // maxAzs: 2, // Default is all AZs in the region
+			natGateways: 0,
+			subnetConfiguration: [
+        {
+          name: 'Isolated',
+          subnetType: SubnetType.ISOLATED,
+          cidrMask: 26,
+        },
+      ],
     });
     // MasterUsername admin cannot be used as it is a reserved word used by the engine
     const databaseUsername = 'root';
@@ -38,12 +40,12 @@ export class RdsStack extends Stack {
       }
     });
     
-    new ssm.StringParameter(this, 'DBCredentialsArn', {
+    new StringParameter(this, 'DBCredentialsArn', {
       parameterName: 'rds-credentials-arn',
       stringValue: databaseCredentialsSecret.secretArn,
     });
 
-    new CfnOutput(this,'dbCredentialsSecretARN', {
+    new cdk.CfnOutput(this,'dbCredentialsSecretARN', {
       description: 'The RDS cluster credentials secret ARN',
       value: databaseCredentialsSecret.secretArn,
       exportName: `${this.stackName}-CREDENTIALS-ARN`
@@ -53,34 +55,39 @@ export class RdsStack extends Stack {
       engine: rds.DatabaseClusterEngine.AURORA_POSTGRESQL,
       vpc: vpc,
       parameterGroup: rds.ParameterGroup.fromParameterGroupName(this, 'ParameterGroup', 'default.aurora-postgresql10'),
+			vpcSubnets: {
+				// https://docs.aws.amazon.com/cdk/api/latest/docs/@aws-cdk_aws-ec2.SubnetType.html
+        subnetType: SubnetType.ISOLATED,
+      },
       credentials: rds.Credentials.fromSecret(databaseCredentialsSecret),
       scaling: {
         minCapacity: rds.AuroraCapacityUnit.ACU_2, // default is 2 Aurora capacity units (ACUs)
         maxCapacity: rds.AuroraCapacityUnit.ACU_16, // default is 16 Aurora capacity units (ACUs)
-        autoPause: Duration.minutes(10),
+        autoPause: cdk.Duration.minutes(10),
       },
       // https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html
       enableDataApi: true,
-      backupRetention: Duration.days(7),
+      backupRetention: cdk.Duration.days(7),
       defaultDatabaseName: 'postgres',
+			removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    Tags.of(cluster).add('Service', 'System');
-    Tags.of(cluster).add('Purpose', 'Operations');
+    cdk.Tags.of(cluster).add('Service', 'System');
+    cdk.Tags.of(cluster).add('Purpose', 'Operations');
 
-    new CfnOutput(this,'ClusterARN', {
+    new cdk.CfnOutput(this,'ClusterARN', {
       description: 'The RDS cluster ARN',
       value: cluster.clusterArn,
       exportName: `${this.stackName}-CLUSTER-ARN`
     });
 
-    new CfnOutput(this,'ClusterId', {
+    new cdk.CfnOutput(this,'ClusterId', {
       description: 'The RDS cluster identifier',
       value: cluster.clusterIdentifier,
       exportName: `${this.stackName}-CLUSTER-ID`
     });
 
-    new CfnOutput(this,'DNSName', {
+    new cdk.CfnOutput(this,'DNSName', {
       description: 'The connection endpoint for the DB cluster.',
       value: cluster.clusterEndpoint.hostname,
       exportName: `${this.stackName}-CLUSTER-DNS`
@@ -95,9 +102,9 @@ const devEnv = {
   region: process.env.CDK_DEFAULT_REGION,
 };
 
-const app = new App();
+const app = new cdk.App();
 
-new RdsStack(app, 'SLS-RDS-DEV', { env: devEnv });
+new Stack(app, 'SLS-RDS-DEV', { env: devEnv });
 // new MyStack(app, 'my-stack-prod', { env: prodEnv });
 
 app.synth();
