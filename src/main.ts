@@ -23,7 +23,8 @@ export class RdsStack extends Stack {
       //   }
       // ]
     });
-    const databaseUsername = 'admin';
+    // MasterUsername admin cannot be used as it is a reserved word used by the engine
+    const databaseUsername = 'root';
     // Dynamically generate the username and password, then store in secrets manager
     const databaseCredentialsSecret = new secrets.Secret(this, 'DBCredentialsSecret', {
       secretName: id+'-rds-credentials',
