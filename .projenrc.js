@@ -3,7 +3,7 @@ const { AwsCdkTypeScriptApp } = require('projen');
 const project = new AwsCdkTypeScriptApp({
   cdkVersion: '1.73.0',
   jsiiFqn: "projen.AwsCdkTypeScriptApp",
-  name: 'mw-catalogue-curation',
+  name: 'aws-cdk-rds',
   cdkDependencies: [
     '@aws-cdk/aws-apigatewayv2',
     '@aws-cdk/aws-apigatewayv2-integrations',

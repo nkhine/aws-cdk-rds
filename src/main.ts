@@ -5,7 +5,7 @@ import * as secrets from '@aws-cdk/aws-secretsmanager';
 const ssm = require('@aws-cdk/aws-ssm');
 // import {AttachmentTargetType, ISecretAttachmentTarget, SecretAttachmentTargetProps, SecretTargetAttachment} from "@aws-cdk/aws-secretsmanager";
 
-export class MwCatalogueStack extends Stack {
+export class RdsStack extends Stack {
 
   constructor(scope: Construct, id: string, props: StackProps = {}) {
     super(scope, id, props);
@@ -15,8 +15,15 @@ export class MwCatalogueStack extends Stack {
     const vpc = new ec2.Vpc(this, 'Vpc', {
       cidr: '10.80.0.0/16',
       maxAzs: 2, // Default is all AZs in the region
+      // subnetConfiguration: [
+      //   {
+      //     cidrMask: 24,
+      //     subnetType: ec2.SubnetType.ISOLATED,
+      //     name: 'Ingress'
+      //   }
+      // ]
     });
-    const databaseUsername = 'magic';
+    const databaseUsername = 'admin';
     // Dynamically generate the username and password, then store in secrets manager
     const databaseCredentialsSecret = new secrets.Secret(this, 'DBCredentialsSecret', {
       secretName: id+'-rds-credentials',
@@ -87,7 +94,7 @@ const devEnv = {
 
 const app = new App();
 
-new MwCatalogueStack(app, 'MW-CATALOGUE-CURATION-DEV', { env: devEnv });
+new RdsStack(app, 'SLS-RDS-DEV', { env: devEnv });
 // new MyStack(app, 'my-stack-prod', { env: prodEnv });
 
 app.synth();

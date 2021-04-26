@@ -1,5 +1,5 @@
 {
-  "name": "mw-catalogue-curation",
+  "name": "aws-cdk-rds",
   "scripts": {
     "projen": "npx projen",
     "start": "npx projen start",
