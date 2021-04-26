@@ -61,6 +61,8 @@ export class RdsStack extends Stack {
       },
       // https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html
       enableDataApi: true,
+      backupRetention: Duration.days(7),
+      defaultDatabaseName: 'postgres',
     });
 
     Tags.of(cluster).add('Service', 'System');
