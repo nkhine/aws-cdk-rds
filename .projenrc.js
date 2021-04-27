@@ -14,6 +14,7 @@ const project = new AwsCdkTypeScriptApp({
     '@aws-cdk/aws-ssm',
     '@aws-cdk/core',
     'source-map-support',
+    'dotenv-flow',
   ],
   /* AwsCdkTypeScriptAppOptions */
   // appEntrypoint: 'main.ts',                                                 /* The CDK app's entrypoint (relative to the source directory, which is "src" by default). */

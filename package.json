@@ -49,6 +49,7 @@
     "@aws-cdk/aws-secretsmanager": "^1.73.0",
     "@aws-cdk/aws-ssm": "^1.73.0",
     "@aws-cdk/core": "^1.73.0",
+    "dotenv-flow": "^1.73.0",
     "source-map-support": "^1.73.0"
   },
   "bundledDependencies": [],
