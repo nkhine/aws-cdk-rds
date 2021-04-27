@@ -61,7 +61,7 @@ export class Database extends core.Construct {
       // https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html
       enableDataApi: true,
     });
-		core.Tags.of(this.cluster).add('Service', 'System');
+    core.Tags.of(this.cluster).add('Service', 'System');
     core.Tags.of(this.cluster).add('Purpose', 'Operations');
   }
 }
