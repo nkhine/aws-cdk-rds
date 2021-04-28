@@ -1,9 +1,9 @@
-import * as cdk from '@aws-cdk/core';
+import * as core from '@aws-cdk/core';
 import { CfnTransitGateway } from '@aws-cdk/aws-ec2';
 // https://github.com/tecracer/cdk-testing/blob/master/cdk-transitgateway/lib/vpc-setting.ts
-export class CdkTransitgatewayStack extends cdk.Stack {
+export class CdkTransitgatewayStack extends core.Stack {
   public transitGateway: CfnTransitGateway;
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: core.Construct, id: string, props?: core.StackProps) {
     super(scope, id, props);
 
     // define resources here...
@@ -20,11 +20,11 @@ export class CdkTransitgatewayStack extends cdk.Stack {
       autoAcceptSharedAttachments: enable,
       dnsSupport: enable, 
       defaultRouteTableAssociation: enable,
-      // tags: [new cdk.Tag('Name', 'demoTGW'), new cdk.Tag('Project', 'demo environment')],
+      // tags: [new core.Tag('Name', 'demoTGW'), new core.Tag('Project', 'demo environment')],
 
     });
-    cdk.Tags.of(demoTGW).add('Service', 'System');
-    cdk.Tags.of(demoTGW).add('Purpose', 'Operations');
+    core.Tags.of(demoTGW).add('Service', 'System');
+    core.Tags.of(demoTGW).add('Purpose', 'Operations');
 
     this.transitGateway = demoTGW
   }

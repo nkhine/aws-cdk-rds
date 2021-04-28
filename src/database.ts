@@ -17,8 +17,8 @@ export class Database extends core.Construct {
 
   constructor(scope: core.Construct, id: string, { vpc }: ISubstrateProps) {
     super(scope, id);
-		// MasterUsername admin cannot be used as it is a reserved word used by the engine
-		const databaseUsername = 'root';
+    // MasterUsername admin cannot be used as it is a reserved word used by the engine
+    const databaseUsername = 'root';
     // Dynamically generate the username and password, then store in secrets manager
     const databaseCredentialsSecret = new secrets.Secret(this, 'DBCredentialsSecret', {
       secretName: id+'-rds-credentials',
@@ -51,7 +51,7 @@ export class Database extends core.Construct {
         "default.aurora-postgresql10"
       ),
       defaultDatabaseName: DB_NAME,
-			credentials: rds.Credentials.fromSecret(databaseCredentialsSecret),
+      credentials: rds.Credentials.fromSecret(databaseCredentialsSecret),
       securityGroups: [this.securityGroup],
       scaling: {
         minCapacity: rds.AuroraCapacityUnit.ACU_2, // default is 2 Aurora capacity units (ACUs)
